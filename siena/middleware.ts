@@ -1,51 +1,31 @@
-
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-// import { LinksEnum } from '@/utils/pagesLinksEnum';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { updateSession } from "@/utils/supabase/middleware";
 
 export const config = {
-    matcher: [
-        "/",
-        "/:path*",
-        "/((?!api|_next/static|_next/image|assets|favicon.ico|sw.js|).*)",
-    ],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };
-
-// const NO_AUTH_ROUTES = [LinksEnum.login, LinksEnum.password_reset];
-
 
 //authMidelware
-export const authMidelware = (req: NextRequest) => {
-    const sessionCookies = req.cookies.get("session");
-    // const currentPath = req.nextUrl.pathname;
-    console.log(sessionCookies);
-    
+export async function authMidelware(request: NextRequest) {
+  return await updateSession(request);
+}
 
-    // if (sessionCookies === null || sessionCookies === undefined || !sessionCookies) {
-    //     if (NO_AUTH_ROUTES.some((route) => currentPath.includes(route))) {
-    //         console.log("it's no auth route");
-    //         return NextResponse.next();
-    //     }
-    //     return NextResponse.redirect(
-    //         new URL(`/${LinksEnum.login}`, req.url)
-    //     );
-    // }
-
-    // if (sessionCookies && NO_AUTH_ROUTES.some((route) => currentPath.includes(route))) {
-    //     return NextResponse.redirect(new URL("/", req.url));
-    // }
-
-};
-
-
-const middlewares = [
-    authMidelware,
-];
+const middlewares = [authMidelware];
 
 export async function middleware(req: NextRequest) {
-    for (const m of middlewares) {
-        const res = await m(req);
-        if (res != null) return res;
-    }
-    return NextResponse.next();
+  for (const m of middlewares) {
+    const res = await m(req);
+    if (res != null) return res;
+  }
+  return NextResponse.next();
 }

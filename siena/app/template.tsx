@@ -2,9 +2,7 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/sidebar";
 import { isPublicRoute } from "@/utils/pagesRoutesEnum";
-import { redirect, usePathname } from "next/navigation";
-import { useEffect } from "react";
-
+import { usePathname } from "next/navigation";
 
 export default function Template({
     children,
@@ -12,20 +10,11 @@ export default function Template({
     children: React.ReactNode;
 }>) {
 
-    // const isAuth = true
     const pathname = usePathname();
     const isPublic = isPublicRoute(pathname);
+    
 
-    // useEffect(() => {
-    //   if (!isAuth && !isPublicRoute(pathname)) {
-    //     redirect(LinksEnum.login);
-    //   }
-    // }, [isAuth, pathname]);
 
-    useEffect(()=>{
-        console.log(isPublic);
-        
-    },[isPublic])    
 
     return (
         <>
